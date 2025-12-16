@@ -1,0 +1,4 @@
+.venv/
+static/
+artifacts/
+.env
