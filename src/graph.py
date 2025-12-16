@@ -65,11 +65,11 @@ def _load_system_prompt() -> str:
 
 
 # -----------------------------
-# 3) LLM Azure OpenAI
+# 3) LLM Azure OpenAI - Agente principal
 # -----------------------------
 def _get_llm() -> AzureChatOpenAI:
     """
-    LLM único (tu 4.0 omnimodal). Usamos AzureChatOpenAI.
+    LLM único. Usamos AzureChatOpenAI.
     Requiere:
     - AZURE_OPENAI_ENDPOINT
     - AZURE_OPENAI_API_KEY
