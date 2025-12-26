@@ -60,6 +60,8 @@ def _load_system_prompt() -> str:
         "Herramientas disponibles:\n"
         "- get_weather(location): clima actual por ciudad\n"
         "- generate_image(prompt): genera imagen y retorna ruta\n\n"
+        "search_products_by_name(name): busca productos en la base de datos por nombre\n"
+        "get_low_stock_products(threshold): lista productos con stock bajo\n\n"
         "Si el usuario pregunta por clima, extrae la ciudad del mensaje y llama get_weather.\n"
         "Si el usuario pide una imagen, llama generate_image con un prompt corto.\n"
         "Después de usar herramientas, redacta la respuesta final."

@@ -38,7 +38,10 @@ ollama --version
 cd langgraph
 
 # Crear entorno virtual
-python -m venv .venv
+# mv .venv .venv-old
+# python -m venv .venv
+python3.13 -m venv .venv
+
 
 # Activar entorno virtual
 source .venv/bin/activate  # macOS/Linux
