@@ -29,7 +29,7 @@ Usuario → Agente → Tool (si aplica) → Agente → Respuesta final
 
 ---
 
-## 🏗️ Arquitectura simple
+## 🏗️ Arquitectura (alto nivel)
 
 * **LangGraph**: orquestación del flujo agent ↔ tools
 * **Azure OpenAI (GPT-4o)**:
@@ -125,12 +125,16 @@ http://localhost:8000/chat
 
 ---
 
-## 🔁 Swagger disponible en
-```
-http://localhost:8000/docs#/default/chat_chat_post
+### 3️⃣ Levantar la interfaz Streamlit
+
+En otra terminal:
+
+```bash
+streamlit run streamlit_app.py
 ```
 
 ---
+
 ## 🔁 Contrato de la API
 
 ### Request

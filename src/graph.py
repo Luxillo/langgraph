@@ -18,7 +18,8 @@ from pathlib import Path
 from typing import TypedDict, List, Annotated
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
-from langchain_openai import AzureChatOpenAI
+from langchain_core.language_models.chat_models import BaseChatModel
+from src.llm import get_llm
 
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
@@ -67,34 +68,11 @@ def _load_system_prompt() -> str:
 # -----------------------------
 # 3) LLM Azure OpenAI - Agente principal
 # -----------------------------
-def _get_llm() -> AzureChatOpenAI:
+def _get_llm() -> BaseChatModel:
     """
-    LLM único. Usamos AzureChatOpenAI.
-    Requiere:
-    - AZURE_OPENAI_ENDPOINT
-    - AZURE_OPENAI_API_KEY
-    - AZURE_OPENAI_API_VERSION
-    - AZURE_OPENAI_CHAT_DEPLOYMENT
+    LLM único. Usa el cliente centralizado (Ollama por defecto).
     """
-    endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
-    api_key = os.getenv("AZURE_OPENAI_API_KEY")
-    api_version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-10-21")
-    deployment = os.getenv("AZURE_OPENAI_CHAT_DEPLOYMENT")
-
-    if not endpoint:
-        raise RuntimeError("Falta AZURE_OPENAI_ENDPOINT. ¿Cargaste el .env?")
-    if not api_key:
-        raise RuntimeError("Falta AZURE_OPENAI_API_KEY. ¿Cargaste el .env?")
-    if not deployment:
-        raise RuntimeError("Falta AZURE_OPENAI_CHAT_DEPLOYMENT. ¿Cargaste el .env?")
-
-    return AzureChatOpenAI(
-        azure_endpoint=endpoint,
-        api_key=api_key,
-        api_version=api_version,
-        azure_deployment=deployment,
-        temperature=0.2,
-    )
+    return get_llm()
 
 
 # -----------------------------

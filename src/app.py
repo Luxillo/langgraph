@@ -24,6 +24,8 @@ logger = logging.getLogger("langgraph-demo")
 
 # ✅ 2) Importar graph DESPUÉS de cargar env
 from src.graph import build_graph
+from fastapi import Depends
+from src.api import db_tools
 
 
 app = FastAPI(title="Pragma LangGraph Multiagent Template")
@@ -36,6 +38,9 @@ repo_root = Path(__file__).resolve().parents[1]  # src/app.py -> repo_root
 static_dir = repo_root / "static"
 static_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# Include DB tools router for manual testing
+app.include_router(db_tools.router)
 
 
 class ChatIn(BaseModel):

@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16 # O una versión específica como postgres:16
+    container_name: mi_postgres_db
+    environment:
+      POSTGRES_USER: agente_user # Usuario opcional
+      POSTGRES_PASSWORD: agente3_84p # ¡Cambia esto!
+      POSTGRES_DB: midb # Nombre de la base de datos opcional
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped # Para que se reinicie si falla
+volumes:
+  postgres_data: # Define el volumen aquí
