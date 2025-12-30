@@ -1,14 +1,3 @@
-docker run --name mi-postgres -e POSTGRES_PASSWORD=mi_secreto -p 5432:5432 -v postgres_data:/var/lib/postgresql/data -d postgres
-
-
-
-cat 01_db_supermercado_DDL.sql | docker exec -i -e PGPASSWORD='agente3_%84p' mi_postgres_db psql -U agente_user -d midb
-
-cat 02_db_supermercado_DML_INSERTS.sql | docker exec -i -e PGPASSWORD='agente3_%84p' mi_postgres_db psql -U agente_user -d midb
-
-cat 03_db_supermercado_DML_UPDATES.sql | docker exec -i -e PGPASSWORD='agente3_%84p' mi_postgres_db psql -U agente_user -d midb
-```
-
 # Ejecutar archivos SQL en `notas/sql` usando `notas/docker-compose.yaml`
 
 Antes de ejecutar los comandos, levante el servicio Postgres con compose:
@@ -26,10 +15,22 @@ Opciones para ejecutar los .sql (recomendado: 1 o 2):
     docker-compose -f notas/docker-compose.yaml exec -T postgres psql -U agente_user -d midb < notas/sql/01_db_supermercado_DDL.sql
 
 # Ejecutar los demás archivos
-docker-compose -f docker-compose.yaml exec -T postgres psql -U agente_user -d midb < sql/02_db_supermercado_DML_INSERTS.sql
+
+cat 01_db_supermercado_DDL.sql | docker exec -i -e PGPASSWORD='agente3_84p' mi_postgres_db psql -U agente_user -d midb
+cat 02_db_supermercado_DML_INSERTS.sql | docker exec -i -e PGPASSWORD='agente3_84p' mi_postgres_db psql -U agente_user -d midb
+cat 03_db_supermercado_DML_UPDATES.sql | docker exec -i -e PGPASSWORD='agente3_84p' mi_postgres_db psql -U agente_user -d midb
+
+
+pwd  # linux y MAc
 docker-compose -f docker-compose.yaml exec -T postgres psql -U agente_user -d midb < sql/03_db_supermercado_DML_UPDATES.sql
 docker-compose -f docker-compose.yaml exec -T postgres psql -U agente_user -d midb < sql/04_db_supermercado_DML_UPDATES.sql
 docker-compose -f docker-compose.yaml exec -T postgres psql -U agente_user -d midb < sql/05_db_supermercado_DML_UPDATES.sql
+
+# Windows
+cd notas
+Get-Content sql/01_db_supermercado_DDL.sql | docker-compose exec -T postgres psql -U agente_user -d midb
+Get-Content sql/02_db_supermercado_DML_INSERTS.sql | docker-compose exec -T postgres psql -U agente_user -d midb
+Get-Content sql/03_db_supermercado_DML_UPDATES.sql | docker-compose exec -T postgres psql -U agente_user -d midb
 
 # Ejecutar todos los .sql del directorio (en orden por nombre)
 for f in sql/*.sql; do
@@ -72,7 +73,7 @@ docker-compose -f notas/docker-compose.yaml exec -T postgres psql -U agente_user
 Fin.
 
 
-docker-compose -f notas/docker-compose.yaml down -v
-docker-compose -f notas/docker-compose.yaml up -d
+docker-compose -f docker-compose.yaml down -v
+docker-compose -f docker-compose.yaml up -d
 # Esto volverá a crear la BD con la contraseña actual en docker-compose.yaml
 python3 -m scripts.test_db

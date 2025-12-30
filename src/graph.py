@@ -27,6 +27,7 @@ from langgraph.graph.message import add_messages  # ✅ merge correcto del histo
 
 from src.tools.weather import get_weather
 from src.tools.image import generate_image
+from src.tools.database.product_tools import search_products_by_name, get_low_stock_products
 import logging
 logger = logging.getLogger("langgraph-demo.graph")
 
@@ -84,7 +85,7 @@ def build_graph(save_diagram: bool = True):
     """
 
     # Tools registradas con @tool
-    tools = [get_weather, generate_image]
+    tools = [get_weather, generate_image, search_products_by_name, get_low_stock_products]
     tool_node = ToolNode(tools)
 
     # LLM + tools (habilita tool calling)

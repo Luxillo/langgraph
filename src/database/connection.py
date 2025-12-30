@@ -17,7 +17,7 @@ load_dotenv()
 # Prefer a full DATABASE_URL if provided. Otherwise build it safely from parts
 raw_database_url = os.getenv("DATABASE_URL")
 if raw_database_url and raw_database_url.strip() != "":
-    DATABASE_URL = raw_database_url
+    DATABASE_URL = raw_database_url.replace("postgresql://", "postgresql+psycopg://")
 else:
     db_user = os.getenv("DB_USER") or os.getenv("PGUSER") or "agente_user"
     db_password = os.getenv("DB_PASSWORD") or os.getenv("DB_PASS") or os.getenv("PGPASSWORD") or "agente3_84p"
@@ -27,7 +27,7 @@ else:
     # percent-encode credentials to be URL-safe (handles % and other special chars)
     db_user_enc = quote_plus(db_user)
     db_password_enc = quote_plus(db_password)
-    DATABASE_URL = f"postgresql://{db_user_enc}:{db_password_enc}@{db_host}:{db_port}/{db_name}"
+    DATABASE_URL = f"postgresql+psycopg://{db_user_enc}:{db_password_enc}@{db_host}:{db_port}/{db_name}"
 
 # Create a synchronous engine and session factory
 engine = create_engine(DATABASE_URL, future=True, echo=False)

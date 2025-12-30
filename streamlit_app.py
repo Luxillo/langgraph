@@ -42,7 +42,7 @@ if prompt := st.chat_input("Escribe tu mensaje..."):
                 response = requests.post(
                     API_URL,
                     json={"message": prompt},
-                    timeout=30
+                    timeout=120
                 )
                 
                 if response.status_code == 200:
