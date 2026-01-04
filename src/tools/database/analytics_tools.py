@@ -4,8 +4,15 @@ These tools use the project's DB connection helper to execute analytics queries.
 All tools support optional date ranges (fecha_inicio, fecha_fin).
 """
 from typing import List
+from datetime import datetime
 from langchain_core.tools import tool
 from src.database.connection import execute_query
+
+
+def _get_current_year_range():
+    """Helper function to get current year date range"""
+    current_year = datetime.now().year
+    return f"{current_year}-01-01", f"{current_year}-12-31"
 
 
 # ============================================================================
@@ -13,14 +20,19 @@ from src.database.connection import execute_query
 # ============================================================================
 
 @tool
-def sales_by_date(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def sales_by_date(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Total de ventas agrupadas por fecha.
     Parámetros:
-      - fecha_inicio: formato 'YYYY-MM-DD' (default: 2025-01-01)
-      - fecha_fin: formato 'YYYY-MM-DD' (default: 2026-12-31)
+      - fecha_inicio: formato 'YYYY-MM-DD' (default: año actual)
+      - fecha_fin: formato 'YYYY-MM-DD' (default: año actual)
     Retorna: fecha, cantidad de transacciones, total de ingresos
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         f.fecha,
@@ -36,7 +48,7 @@ def sales_by_date(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31
 
 
 @tool
-def sales_by_employee(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def sales_by_employee(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Total de ventas por empleado (cajero/repositor).
     Parámetros:
@@ -44,6 +56,11 @@ def sales_by_employee(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-1
       - fecha_fin: formato 'YYYY-MM-DD'
     Retorna: nombre del empleado, cargo, cantidad de ventas, total de ingresos
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         e.nombre,
@@ -63,7 +80,7 @@ def sales_by_employee(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-1
 
 
 @tool
-def sales_by_payment_method(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def sales_by_payment_method(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Ingresos por tipo de pago (Efectivo, Tarjeta Crédito, Tarjeta Débito, Cheque).
     Parámetros:
@@ -71,6 +88,11 @@ def sales_by_payment_method(fecha_inicio: str = "2025-01-01", fecha_fin: str = "
       - fecha_fin: formato 'YYYY-MM-DD'
     Retorna: método de pago, cantidad de transacciones, total de ingresos
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         fd.medio_de_pago,
@@ -87,13 +109,18 @@ def sales_by_payment_method(fecha_inicio: str = "2025-01-01", fecha_fin: str = "
 
 
 @tool
-def average_transaction_value(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def average_transaction_value(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Promedio, mínimo, máximo de valor de transacción.
     Parámetros:
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         COUNT(id) as total_transacciones,
@@ -108,7 +135,7 @@ def average_transaction_value(fecha_inicio: str = "2025-01-01", fecha_fin: str =
 
 
 @tool
-def top_employees_by_sales(top_n: int = 5, fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def top_employees_by_sales(top_n: int = 5, fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Top N empleados con más ingresos generados.
     Parámetros:
@@ -116,6 +143,11 @@ def top_employees_by_sales(top_n: int = 5, fecha_inicio: str = "2025-01-01", fec
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         e.nombre,
@@ -139,7 +171,7 @@ def top_employees_by_sales(top_n: int = 5, fecha_inicio: str = "2025-01-01", fec
 # ============================================================================
 
 @tool
-def top_products_by_quantity(top_n: int = 10, fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def top_products_by_quantity(top_n: int = 10, fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Top N productos más vendidos (por cantidad de unidades).
     Parámetros:
@@ -147,6 +179,11 @@ def top_products_by_quantity(top_n: int = 10, fecha_inicio: str = "2025-01-01", 
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         p.id,
@@ -169,7 +206,7 @@ def top_products_by_quantity(top_n: int = 10, fecha_inicio: str = "2025-01-01", 
 
 
 @tool
-def revenue_by_product_category(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def revenue_by_product_category(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Ingresos totales por categoría (grupo) de productos.
     Parámetros:
@@ -177,6 +214,11 @@ def revenue_by_product_category(fecha_inicio: str = "2025-01-01", fecha_fin: str
       - fecha_fin: formato 'YYYY-MM-DD'
     Retorna: categoría, cantidad vendida, ingresos totales, porcentaje
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         p.grupo as categoria,
@@ -226,13 +268,18 @@ def low_stock_products(threshold: int = 100) -> List[dict]:
 
 
 @tool
-def inventory_rotation(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def inventory_rotation(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Rotación de inventario: qué productos se venden rápido vs lento.
     Parámetros:
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         p.id,
@@ -298,7 +345,7 @@ def inventory_by_category() -> List[dict]:
 # ============================================================================
 
 @tool
-def most_frequent_customers(top_n: int = 10, fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def most_frequent_customers(top_n: int = 10, fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Clientes más frecuentes (más compras).
     Parámetros:
@@ -306,6 +353,11 @@ def most_frequent_customers(top_n: int = 10, fecha_inicio: str = "2025-01-01", f
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         c.id,
@@ -328,13 +380,18 @@ def most_frequent_customers(top_n: int = 10, fecha_inicio: str = "2025-01-01", f
 
 
 @tool
-def average_customer_ticket(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def average_customer_ticket(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Ticket promedio por cliente.
     Parámetros:
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         c.nombre,
@@ -356,13 +413,18 @@ def average_customer_ticket(fecha_inicio: str = "2025-01-01", fecha_fin: str = "
 
 
 @tool
-def preferred_payment_methods(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def preferred_payment_methods(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Métodos de pago preferidos por los clientes.
     Parámetros:
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         fd.medio_de_pago,
@@ -386,13 +448,18 @@ def preferred_payment_methods(fecha_inicio: str = "2025-01-01", fecha_fin: str =
 # ============================================================================
 
 @tool
-def revenue_by_supplier(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def revenue_by_supplier(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Ingresos generados por los productos de cada proveedor.
     Parámetros:
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         pr.id,
@@ -420,7 +487,7 @@ def revenue_by_supplier(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026
 
 
 @tool
-def sales_vs_inventory_by_category(fecha_inicio: str = "2025-01-01", fecha_fin: str = "2026-12-31") -> List[dict]:
+def sales_vs_inventory_by_category(fecha_inicio: str = None, fecha_fin: str = None) -> List[dict]:
     """
     Comparativo: ventas vs inventario por categoría.
     Identifica qué categorías tienen alta demanda vs poco stock.
@@ -428,6 +495,11 @@ def sales_vs_inventory_by_category(fecha_inicio: str = "2025-01-01", fecha_fin: 
       - fecha_inicio: formato 'YYYY-MM-DD'
       - fecha_fin: formato 'YYYY-MM-DD'
     """
+    if fecha_inicio is None or fecha_fin is None:
+        default_start, default_end = _get_current_year_range()
+        fecha_inicio = fecha_inicio or default_start
+        fecha_fin = fecha_fin or default_end
+    
     sql = """
     SELECT 
         p.grupo as categoria,

@@ -87,6 +87,8 @@ curl http://localhost:11434/api/tags
 ```bash
 # Desde la carpeta del proyecto (con .venv activado)
 python -m uvicorn src.app:app --reload --port 8000
+
+lsof -ti :8000 | xargs kill -9
 ```
 
 **✅ Deberías ver:**

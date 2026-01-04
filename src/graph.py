@@ -64,9 +64,19 @@ def _detect_tool_from_intent(query: str) -> dict | None:
     
     query_lower = query.lower()
     
-    # Keywords para cada herramienta
-    # PRODUCTOS
-    if any(word in query_lower for word in ["top", "productos más vendidos", "qué se vende", "best selling", "más vendido"]):
+    # Keywords para cada herramienta - ORDEN IMPORTA (más específico primero)
+    
+    # MEJORES VENDEDORES (debe ir antes que productos para evitar conflictos)
+    if any(word in query_lower for word in ["top empleado", "mejores empleados", "mejor vendedor", "mejores vendedores", "best salesperson", "quién vendió más", "empleado más", "top vendedor"]):
+        top_n = _extract_number(query_lower, default=5)
+        fecha_inicio, fecha_fin = _extract_dates(query_lower)
+        return {
+            'tool_name': 'top_employees_by_sales',
+            'parameters': {'top_n': top_n, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}
+        }
+    
+    # PRODUCTOS (después de empleados para evitar conflictos)
+    if any(word in query_lower for word in ["top productos", "productos más vendidos", "qué se vende más", "best selling products", "más vendido", "productos top"]):
         top_n = _extract_number(query_lower, default=10)
         fecha_inicio, fecha_fin = _extract_dates(query_lower)
         return {
@@ -80,15 +90,6 @@ def _detect_tool_from_intent(query: str) -> dict | None:
         return {
             'tool_name': 'sales_by_date',
             'parameters': {'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}
-        }
-    
-    # MEJORES VENDEDORES
-    if any(word in query_lower for word in ["mejor vendedor", "top empleado", "best salesperson", "quién vendió", "empleado más"]):
-        top_n = _extract_number(query_lower, default=5)
-        fecha_inicio, fecha_fin = _extract_dates(query_lower)
-        return {
-            'tool_name': 'top_employees_by_sales',
-            'parameters': {'top_n': top_n, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}
         }
     
     # STOCK BAJO
@@ -181,7 +182,9 @@ def _extract_dates(text: str) -> tuple[str, str]:
     """
     from datetime import datetime, timedelta
     
-    today = datetime(2025, 1, 3)  # Fecha del sistema
+    # Usar fecha actual del sistema
+    today = datetime.now()
+    current_year = today.year
     
     months = {
         'enero': (1, 1), 'febrero': (2, 1), 'marzo': (3, 1), 'abril': (4, 1),
@@ -194,21 +197,21 @@ def _extract_dates(text: str) -> tuple[str, str]:
     # Detectar mes específico
     for month_name, (month, _) in months.items():
         if month_name in text_lower:
-            start = datetime(2025, month, 1)
+            start = datetime(current_year, month, 1)
             # Calcular último día del mes
             if month == 12:
-                end = datetime(2025, 12, 31)
+                end = datetime(current_year, 12, 31)
             else:
-                end = datetime(2025, month + 1, 1) - timedelta(days=1)
+                end = datetime(current_year, month + 1, 1) - timedelta(days=1)
             return (start.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d'))
     
     # "Este mes"
     if 'este mes' in text_lower:
-        start = datetime(2025, today.month, 1)
+        start = datetime(current_year, today.month, 1)
         if today.month == 12:
-            end = datetime(2025, 12, 31)
+            end = datetime(current_year, 12, 31)
         else:
-            end = datetime(2025, today.month + 1, 1) - timedelta(days=1)
+            end = datetime(current_year, today.month + 1, 1) - timedelta(days=1)
         return (start.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d'))
     
     # "Última semana"
@@ -217,8 +220,8 @@ def _extract_dates(text: str) -> tuple[str, str]:
         start = today - timedelta(days=7)
         return (start.strftime('%Y-%m-%d'), end.strftime('%Y-%m-%d'))
     
-    # Default: todo el año
-    return ('2025-01-01', '2025-12-31')
+    # Default: todo el año actual
+    return (f'{current_year}-01-01', f'{current_year}-12-31')
 
 
 
