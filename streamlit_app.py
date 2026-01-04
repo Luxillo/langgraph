@@ -12,7 +12,7 @@ st.set_page_config(
 
 # Título
 st.title("🤖 Bot Multiagente - LangGraph Demo")
-st.markdown("*Powered by Qwen3:8B + LangGraph*")
+st.markdown("*Impulsado por Qwen3:8B + mistral:7b + LangGraph*")
 
 # URL de la API
 API_URL = "http://localhost:8000/chat"

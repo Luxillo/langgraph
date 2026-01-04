@@ -53,11 +53,46 @@ def chat(body: ChatIn):
     Flujo:
     1) Entramos con el mensaje del usuario.
     2) Invocamos el grafo.
-    3) Devolvemos el último mensaje como respuesta final.
+    3) Extraemos datos de ToolMessage o respuesta del LLM.
     """
+    from langchain_core.messages import ToolMessage
+    import json
+    
     state = {"messages": [HumanMessage(content=body.message)]}
-    out = graph.invoke(state)
+    
+    try:
+        out = graph.invoke(state, config={"recursion_limit": 10})
+    except Exception as e:
+        logger.error(f"Error en grafo: {e}")
+        return {"answer": f"Error: {str(e)[:100]}"}
 
+    # Buscar ToolMessage o respuesta final
+    tool_data = None
+    
+    for msg in out["messages"]:
+        if isinstance(msg, ToolMessage):
+            # Extraer datos de la herramienta
+            try:
+                content = msg.content
+                # Si es string JSON, parsearlo
+                if isinstance(content, str):
+                    tool_data = json.loads(content)
+                else:
+                    tool_data = content
+                    
+                if tool_data:
+                    logger.info(f"✅ Datos retornados: {len(tool_data) if isinstance(tool_data, list) else 1} registros")
+                    # Formatear como tabla
+                    if isinstance(tool_data, list) and tool_data:
+                        formatted = "📊 **Resultados:**\n\n"
+                        formatted += "```json\n"
+                        formatted += json.dumps(tool_data, ensure_ascii=False, indent=2)
+                        formatted += "\n```"
+                        return {"answer": formatted}
+            except:
+                pass
+
+    # Si no hay ToolMessage, retornar respuesta del LLM
     final_msg = out["messages"][-1]
     answer = getattr(final_msg, "content", str(final_msg))
 

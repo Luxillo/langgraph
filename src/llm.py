@@ -34,7 +34,7 @@ def get_ollama_llm() -> ChatOllama:
     return ChatOllama(
         model=model,
         base_url=base_url,
-        temperature=0.2,
+        temperature=0.1,  # Más bajo para respuestas consistentes
     )
 
 

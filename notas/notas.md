@@ -20,6 +20,7 @@ cat 01_db_supermercado_DDL.sql | docker exec -i -e PGPASSWORD='agente3_84p' mi_p
 cat 02_db_supermercado_DML_INSERTS.sql | docker exec -i -e PGPASSWORD='agente3_84p' mi_postgres_db psql -U agente_user -d midb
 cat 03_db_supermercado_DML_UPDATES.sql | docker exec -i -e PGPASSWORD='agente3_84p' mi_postgres_db psql -U agente_user -d midb
 
+docker exec -i -e PGPASSWORD='agente3_84p' mi_postgres_db psql -U agente_user -d midb -c "SELECT * FROM productos;"
 
 pwd  # linux y MAc
 docker-compose -f docker-compose.yaml exec -T postgres psql -U agente_user -d midb < sql/03_db_supermercado_DML_UPDATES.sql
@@ -73,7 +74,7 @@ docker-compose -f notas/docker-compose.yaml exec -T postgres psql -U agente_user
 Fin.
 
 
-docker-compose -f docker-compose.yaml down -v
+docker-compose -f docker-compose.yaml down
 docker-compose -f docker-compose.yaml up -d
 # Esto volverá a crear la BD con la contraseña actual en docker-compose.yaml
 python3 -m scripts.test_db
